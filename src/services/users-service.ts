@@ -21,13 +21,32 @@ export const usersService = {
       cost: 10,
     });
 
-    // 3. Insert user into database
+    // 3. Generate token
+    const token = crypto.randomUUID();
+
+    // 4. Insert user into database
     await db.insert(users).values({
       name,
       email,
       password: hashedPassword,
+      token,
     });
 
-    return { success: true };
+    return { success: true, token };
+  },
+
+  async getCurrentUser(token: string) {
+    const result = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        createdAt: users.createdAt,
+      })
+      .from(users)
+      .where(eq(users.token, token))
+      .limit(1);
+
+    return result.length > 0 ? result[0] : null;
   },
 };
