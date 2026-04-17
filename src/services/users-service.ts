@@ -49,4 +49,13 @@ export const usersService = {
 
     return result.length > 0 ? result[0] : null;
   },
+
+  async logoutUser(token: string) {
+    const result: any = await db
+      .update(users)
+      .set({ token: null })
+      .where(eq(users.token, token));
+
+    return result[0].affectedRows > 0;
+  },
 };
